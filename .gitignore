@@ -1,0 +1,18 @@
+# App artifacts
+/_build
+/db
+/deps
+/*.ez
+/tmp
+
+erl_crash.dump
+
+npm-debug.log
+
+/assets/node_modules
+
+/priv/static/
+
+/config/*.secret.exs
+
+cover/
