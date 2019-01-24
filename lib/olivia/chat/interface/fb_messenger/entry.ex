@@ -9,7 +9,7 @@ defmodule Olivia.Chat.Interface.FbMessenger.Entry do
   alias Olivia.Chat.Interface.FbMessenger.Dispatcher
 
   @doc """
-  Entry point for regular facebook messages
+  Entry messages
   """
   def entry_messages([%{"messaging" => messaging} | _] = payload) do
     sender_id = hd(messaging)["sender"]["id"]
@@ -24,9 +24,23 @@ defmodule Olivia.Chat.Interface.FbMessenger.Entry do
   end
 
   @doc """
+  Process each message
+  """  defp process_messages(%{"messaging" => [payload | _]}) do
+    sender_id = payload["sender"]["id"]
+    recipient_id = payload["recipient"]["id"]
+    token = Application.get_env(:olivia, :fb_page_access_token)
+
+    payload
+    |> Translation.process_messages
+    |> Conversation.received_message
+    |> Thinker.run
+    |> Dispatcher.build_response(sender_id, token)
+  end
+
+  @doc """
   Sends a message to Facebook to signal typing.
   """
-  def start_typing_indicator(sender_id, token) do
+  defp start_typing_indicator(sender_id, token) do
     %{
       "messaging_type" => "RESPONSE",
       "recipient" => %{"id" => sender_id},
@@ -40,24 +54,12 @@ defmodule Olivia.Chat.Interface.FbMessenger.Entry do
   @doc """
   Sends a message to Facebook to end typing signal.
   """
-  def stop_typing_indicator(sender_id, token) do
+  defp stop_typing_indicator(sender_id, token) do
     %{
       "messaging_type" => "RESPONSE",
       "recipient" => %{"id" => sender_id},
       "sender_action" => "typing_off"
     }
     |> Dispatcher.send_response(token)
-  end
-
-  defp process_messages(%{"messaging" => [payload | _]}) do
-    sender_id = payload["sender"]["id"]
-    recipient_id = payload["recipient"]["id"]
-    token = Application.get_env(:olivia, :fb_page_access_token)
-
-    payload
-    |> Translation.process_messages
-    |> Conversation.received_message
-    |> Thinker.run
-    |> Dispatcher.build_response(sender_id, token)
   end
 end

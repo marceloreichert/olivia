@@ -3,13 +3,23 @@ defmodule Olivia.Chat.Interface.WebApp.Entry do
   Entry
   """
 
-  alias Olivia.Chat.Interface.WebApp.Message
+  alias Olivia.Chat.Conversation
+  alias Olivia.Chat.Thinker
+  alias Olivia.Chat.Interface.WebApp.Translation
 
   @doc """
   Entry point for messages
   """
-  def process_messages(payload) do
+  def entry_messages(payload) do
     payload
-    |> Enum.each(&Message.process_messages/1)
+    |> Enum.each(&process_messages/1)
   end
+
+  defp process_messages(payload) do
+    payload
+    |> Translation.translate_entry
+    |> Conversation.received_message
+    |> Thinker.run
+  end
+
 end
