@@ -5,13 +5,13 @@ defmodule Olivia.Chat.Interface.WebApp.Dispatcher do
 
   alias Olivia.Chat.Conversation
 
-  def send_messenger_response([]), do: []
+  def send_response([]), do: []
 
-  def send_messenger_response([h | t]) do
-    [send_messenger_response(h) | send_messenger_response(t)]
+  def send_response([h | t]) do
+    [send_response(h) | send_response(t)]
   end
 
-  def send_messenger_response(response) do
+  def send_response(response) do
     Conversation.sent_message(response["recipient"]["id"], response)
     response
   end

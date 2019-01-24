@@ -11,7 +11,7 @@ defmodule Olivia.Chat.Interface.FbMessenger.Dispatcher do
   def send_response([]), do: []
 
   def send_response([h | t]) do
-    [send_messenger_response(h) | send_messenger_response(t)]
+    [send_response(h) | send_response(t)]
   end
 
   def send_response(response) do
