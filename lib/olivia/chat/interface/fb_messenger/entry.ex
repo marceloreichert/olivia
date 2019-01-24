@@ -23,10 +23,7 @@ defmodule Olivia.Chat.Interface.FbMessenger.Entry do
     stop_typing_indicator(sender_id, token)
   end
 
-  @doc """
-  Process each message
-  """
-  defp process_messages(%{"messaging" => [payload | _]}) do
+  def process_messages(%{"messaging" => [payload | _]}) do
     sender_id = payload["sender"]["id"]
     recipient_id = payload["recipient"]["id"]
     token = Application.get_env(:olivia, :fb_page_access_token)
