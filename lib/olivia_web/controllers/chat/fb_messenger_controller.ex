@@ -1,4 +1,4 @@
-defmodule OliviaWeb.Chat.MessengerController do
+defmodule OliviaWeb.Chat.FbMessengerController do
   use OliviaWeb, :controller
 
   def create(conn, params) do

@@ -1,7 +1,7 @@
 defmodule Olivia.DispatcherTest do
   use ExUnit.Case
 
-  alias Olivia.FbMessenger.Dispatcher
+  alias Olivia.Chat.Interface.FbMessenger.Dispatcher
 
   test "send_messenger_response/0" do
     assert Dispatcher.send_messenger_response([]) == []

@@ -1,9 +1,9 @@
-defmodule Olivia.FbMessengerTest do
+defmodule Olivia.Chat.Interface.FbMessenger.EntryTest do
   use ExUnit.Case
 
-  alias Olivia.FbMessenger
+  alias Olivia.Chat.Interface.FbMessenger.Entry
 
-  @fb_message_entries [
+  @message [
     %{
       "id" => "217_557_272_146_428",
       "messaging" => [
@@ -24,7 +24,7 @@ defmodule Olivia.FbMessengerTest do
 
   describe "process_messages/1" do
     test "" do
-      FbMessenger.process_messages(@fb_message_entries)
+      Entry.process_messages(@message)
     end
   end
 
