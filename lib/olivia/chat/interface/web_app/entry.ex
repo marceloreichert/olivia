@@ -1,15 +1,15 @@
 defmodule Olivia.Chat.Interface.WebApp.Entry do
   @moduledoc """
-  Translates WebApp post message events into Olivia-friendly internal representations (Impressions)
+  Entry
   """
 
   alias Olivia.Chat.Interface.WebApp.Message
 
   @doc """
-  Entry point for regular messages (free text)
+  Entry point for messages
   """
   def process_messages(payload) do
     payload
-    |> Message.received_message
+    |> Enum.each(&Message.process_messages/1)
   end
 end

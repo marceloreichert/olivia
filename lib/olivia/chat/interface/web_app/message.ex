@@ -7,7 +7,7 @@ defmodule Olivia.Chat.Interface.WebApp.Message do
   alias Olivia.Chat.Thinker
   alias Olivia.Chat.Interface.WebApp.Translation
 
-  def received_message(payload) do
+  def process_messages(payload) do
     payload
     |> Translation.translate_entry
     |> Conversation.received_message
