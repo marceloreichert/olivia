@@ -1,10 +1,10 @@
-defmodule Olivia.NetworkTest do
+defmodule Olivia.DispatcherTest do
   use ExUnit.Case
 
-  alias Olivia.FbMessenger.Network
+  alias Olivia.FbMessenger.Dispatcher
 
   test "send_messenger_response/0" do
-    assert Network.send_messenger_response([]) == []
+    assert Dispatcher.send_messenger_response([]) == []
   end
 
   describe "send_messenger_response/1" do

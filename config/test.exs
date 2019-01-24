@@ -6,7 +6,7 @@ config :olivia, OliviaWeb.Endpoint,
 
 config :logger, level: :warn
 
-config :olivia, :fb_messenger_network, Olivia.FbMessenger.Network.Mock
+config :olivia, :fb_messenger_dispatcher, Olivia.FbMessenger.Dispatcher.Mock
 config :olivia, :nlp, Olivia.NLPMock
 
 config :olivia, :bots, [

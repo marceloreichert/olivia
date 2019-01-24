@@ -1,6 +1,6 @@
-defmodule Olivia.Chat.Interface.WebApp.Network do
+defmodule Olivia.Chat.Interface.WebApp.Dispatcher do
   @moduledoc """
-  Handles network ops for web applications medium
+  Dispatcher messages
   """
 
   alias Olivia.Chat.Conversation

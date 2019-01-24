@@ -4,7 +4,7 @@ defmodule Olivia.Chat.Interface.FbMessenger.Entry do
   """
 
   alias Olivia.Chat.Interface.FbMessenger.Message
-  alias Olivia.Chat.Interface.FbMessenger.Network
+  alias Olivia.Chat.Interface.FbMessenger.Dispatcher
 
   @doc """
   Entry point for regular facebook messages
@@ -30,7 +30,7 @@ defmodule Olivia.Chat.Interface.FbMessenger.Entry do
       "recipient" => %{"id" => sender_id},
       "sender_action" => "typing_on"
     }
-    |> Network.send_messenger_response(token)
+    |> Dispatcher.send_messenger_response(token)
 
     sender_id
   end
@@ -44,6 +44,6 @@ defmodule Olivia.Chat.Interface.FbMessenger.Entry do
       "recipient" => %{"id" => sender_id},
       "sender_action" => "typing_off"
     }
-    |> Network.send_messenger_response(token)
+    |> Dispatcher.send_messenger_response(token)
   end
 end

@@ -1,6 +1,6 @@
-defmodule Olivia.Chat.Interface.FbMessenger.Network do
+defmodule Olivia.Chat.Interface.FbMessenger.Dispatcher do
   @moduledoc """
-  Handles network ops for fbmessenger medium
+  Dispatcher messages
   """
 
   alias Olivia.Chat.Conversation

@@ -6,7 +6,7 @@ defmodule Olivia.Chat.Interface.FbMessenger.Message do
   alias Olivia.Chat.Conversation
   alias Olivia.Chat.Thinker
   alias Olivia.Chat.Interface.FbMessenger.Translation
-  alias Olivia.Chat.Interface.FbMessenger.Network
+  alias Olivia.Chat.Interface.FbMessenger.Dispatcher
 
   def process_messages(%{"messaging" => [payload | _]}) do
     sender_id = payload["sender"]["id"]
@@ -39,6 +39,6 @@ defmodule Olivia.Chat.Interface.FbMessenger.Message do
         "text" => text
       }
     }
-    |> Network.send_messenger_response(token)
+    |> Dispatcher.send_messenger_response(token)
   end
 end
