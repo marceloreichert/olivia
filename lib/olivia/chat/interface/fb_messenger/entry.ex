@@ -25,7 +25,8 @@ defmodule Olivia.Chat.Interface.FbMessenger.Entry do
 
   @doc """
   Process each message
-  """  defp process_messages(%{"messaging" => [payload | _]}) do
+  """
+  defp process_messages(%{"messaging" => [payload | _]}) do
     sender_id = payload["sender"]["id"]
     recipient_id = payload["recipient"]["id"]
     token = Application.get_env(:olivia, :fb_page_access_token)
