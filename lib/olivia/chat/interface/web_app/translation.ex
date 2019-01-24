@@ -8,6 +8,7 @@ defmodule Olivia.Chat.Interface.WebApp.Translation do
   Translates standard text entry
   """
   def translate_entry(payload) do
+    IO.inspect payload
     uid = payload["user"]["uid"]
     text = payload["text"]
 

@@ -12,14 +12,8 @@ defmodule Olivia.Chat.Interface.WebApp.Entry do
   """
   def entry_messages(payload) do
     payload
-    |> Enum.each(&process_messages/1)
-  end
-
-  defp process_messages(payload) do
-    payload
     |> Translation.translate_entry
     |> Conversation.received_message
     |> Thinker.run
   end
-
 end
