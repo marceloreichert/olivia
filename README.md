@@ -133,3 +133,8 @@ curl -X POST \
 }
 '
 ```
+
+### TODO
+1. Tests
+2. Build user responder thinker. Respond without use Watson or Wit.
+3. Interface Slack
