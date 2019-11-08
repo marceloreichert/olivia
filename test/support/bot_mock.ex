@@ -1,5 +1,5 @@
 defmodule BotMock do
-  @moduledoc """
+  @moduledoc false """
   """
 
   def recipient_ids do

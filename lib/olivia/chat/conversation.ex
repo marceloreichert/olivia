@@ -9,7 +9,7 @@ defmodule Olivia.Chat.Conversation do
   alias Olivia.Chat.Conversation.Supervisor
 
   defmodule State do
-
+    @moduledoc false
     @environment Application.get_env(:olivia, :environment)
 
     defstruct [

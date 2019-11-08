@@ -1,5 +1,5 @@
 defmodule Olivia.NLPMock do
-  @moduledoc """
+  @moduledoc false """
   """
   def get(message) do
     body =
