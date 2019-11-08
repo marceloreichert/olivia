@@ -61,7 +61,7 @@ defmodule Olivia.Mixfile do
       {:plug_cowboy, "~> 2.0"},
       {:httpoison, "~> 1.0"},
       {:timex, "~> 3.1"},
-      {:credo, "~> 1.0.0", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.1.0", only: [:dev, :test], runtime: false},
       {:excoveralls, "~> 0.8", only: :test},
       {:ex_doc, "~> 0.19", only: :dev},
       {:poison, "~> 3.0"}
