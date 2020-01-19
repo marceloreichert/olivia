@@ -4,8 +4,8 @@ defmodule Olivia.Mixfile do
   def project do
     [
       app: :olivia,
-      version: "1.0.0",
-      elixir: "~> 1.8",
+      version: "0.0.1",
+      elixir: "~> 1.9",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
@@ -49,7 +49,7 @@ defmodule Olivia.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.4.0"},
+      {:phoenix, "~> 1.4.7"},
       {:phoenix_pubsub, "~> 1.1"},
       {:phoenix_ecto, "~> 4.0"},
       {:ecto_sql, "~> 3.0"},
@@ -57,11 +57,11 @@ defmodule Olivia.Mixfile do
       {:phoenix_html, "~> 2.11"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:gettext, "~> 0.11"},
-      {:jason, "~> 1.1"},
+      {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
-      {:httpoison, "~> 1.0"},
-      {:timex, "~> 3.1"},
-      {:credo, "~> 1.1.0", only: [:dev, :test], runtime: false},
+      {:httpoison, "~> 1.6"},
+      {:timex, "~> 3.5"},
+      {:credo, "~> 1.1", only: [:dev, :test], runtime: false},
       {:excoveralls, "~> 0.8", only: :test},
       {:ex_doc, "~> 0.19", only: :dev},
     ]
