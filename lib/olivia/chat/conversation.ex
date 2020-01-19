@@ -77,7 +77,7 @@ defmodule Olivia.Chat.Conversation do
       case thinking_api.create_session do
         {:ok, %{body: body} = response} ->
           body
-          |> Poison.decode!
+          |> Jason.decode!
           |> Map.fetch!("session_id")
         {:undefined} -> sender_id
       end

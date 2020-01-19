@@ -66,7 +66,7 @@ defmodule Olivia.Chat.Thinker.WatsonAssistant.Api do
       options: options
     }
 
-    body = Poison.encode!(%{input: input})
+    body = Jason.encode!(%{input: input})
 
     {:ok, response} =
       HTTPoison.post(url, body, @headers)
@@ -76,7 +76,7 @@ defmodule Olivia.Chat.Thinker.WatsonAssistant.Api do
       end
       |>  (fn {code, body} ->
         body
-        |> Poison.decode(keys: :atoms)
+        |> Jason.decode(keys: :atoms)
         |> case do
              {:ok, parsed} -> {:ok, parsed}
              _ -> {:error, body}

@@ -66,7 +66,7 @@ defmodule Olivia.Chat.Thinker.WatsonAssistant.Thinking do
 
   defp get_session(%{body: watson_response}) do
     watson_response
-    |> Poison.decode!
+    |> Jason.decode!
     |> Map.fetch!("session_id")
   end
 end

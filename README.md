@@ -18,9 +18,8 @@ Olivia is a bot orchestration framework built on Elixir/Phoenix.
 1. `mix phx.new <project_name>`
 2. `cd <project_name>`
 3. Add `{:olivia, git: "https://github.com/marceloreichert/olivia.git", tag: "0.1"}` to mix.exs
-4. Add `{:poison, "~> 3.0"}` to mix.exs
-5. `mix deps.get`
-6. If you decide to use Facebook Messenger, add this webhook to router:
+4. `mix deps.get`
+5. If you decide to use Facebook Messenger, add this webhook to router:
 
 ```
   pipeline :webhook_fb_messenger do

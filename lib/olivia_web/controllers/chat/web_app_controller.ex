@@ -11,7 +11,7 @@ defmodule OliviaWeb.Chat.WebAppController do
   end
 
   defp send_response(%{responses: responses} = impression, conn) do
-    response = Poison.encode!(%{responses: responses})
+    response = Jason.encode!(%{responses: responses})
     send_resp(conn, 200, response)
   end
 

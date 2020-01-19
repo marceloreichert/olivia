@@ -19,7 +19,7 @@ defmodule Olivia.Chat.Thinker.Wit.Thinking do
 
   defp gets_entities(%{body: watson_response}) do
     watson_response
-    |> Poison.decode!()
+    |> Jason.decode!()
     |> Map.fetch("entities")
     |> elem(1)
   end

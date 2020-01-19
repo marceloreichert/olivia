@@ -10,7 +10,7 @@ defmodule Olivia.NLPMock do
           confidence: 1.0
         }
       }
-      |> Poison.encode!()
+      |> Jason.encode!()
 
     {:ok, %{body: body}}
   end
