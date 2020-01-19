@@ -1,4 +1,5 @@
 defmodule Olivia.Chat.Thinker.Wit.Thinking do
+  @moduledoc false
 
   alias Olivia.Chat.Thinker.Wit.Api
 

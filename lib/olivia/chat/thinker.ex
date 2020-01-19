@@ -11,11 +11,11 @@ defmodule Olivia.Chat.Thinker do
   end
 
   def module_nlp_thinking do
-    Module.concat(["Olivia","Chat","Thinker",nlp,"Thinking"])
+    Module.concat(["Olivia", "Chat", "Thinker", nlp, "Thinking"])
   end
 
   def module_api do
-    Module.concat(["Olivia","Chat","Thinker",nlp,"Api"])
+    Module.concat(["Olivia", "Chat", "Thinker", nlp, "Api"])
   end
 
   defp nlp do

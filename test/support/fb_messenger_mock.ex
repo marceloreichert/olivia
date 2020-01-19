@@ -1,5 +1,5 @@
 defmodule Olivia.FbMessenger.Dispatcher.Mock do
-  @moduledoc """
+  @moduledoc false """
   """
   def send_response(_response, _token) do
     :ok
