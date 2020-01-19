@@ -23,40 +23,4 @@ defmodule Olivia.Chat.Thinker do
     |> Atom.to_string
     |> Macro.camelize
   end
-
-  @doc """
-  Matches messages based on the regular expression.
-
-  ## Example
-
-      hear ~r/hello/, msg do
-        # code to handle the message
-      end
-  """
-  defmacro hear(regex, msg, state \\ Macro.escape(%{}), do: block) do
-    name = unique_name(:hear)
-    quote do
-      @hear {unquote(regex), unquote(name)}
-      @doc false
-      def unquote(name)(unquote(msg), unquote(state)) do
-        unquote(block)
-      end
-    end
-  end
-
-  @doc """
-  Send a reply message via the underlying adapter.
-
-  ## Example
-
-      reply msg, "Hello there!"
-  """
-  def reply(%Hedwig.Message{robot: robot} = msg, text) do
-    Hedwig.Robot.reply(robot, %{msg | text: text})
-  end
-
-  defp unique_name(type) do
-    String.to_atom("#{type}_#{System.unique_integer([:positive, :monotonic])}")
-  end
-
 end
