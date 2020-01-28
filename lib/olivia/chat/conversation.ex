@@ -27,6 +27,7 @@ defmodule Olivia.Chat.Conversation do
 
   # five minutes timeout
   @timeout 5 * 60 * 1000
+  @default_nlp Application.get_env(:olivia, :default_nlp)
 
   def start_link(sender_id) do
     GenServer.start_link(__MODULE__, sender_id, name: pid(sender_id))
@@ -71,24 +72,14 @@ defmodule Olivia.Chat.Conversation do
     self()
     |> schedule_timeout()
 
-    thinking_api = Olivia.Chat.Thinker.module_api()
-
-    session_id =
-      case thinking_api.create_session do
-        {:ok, %{body: body} = response} ->
-          body
-          |> Jason.decode!
-          |> Map.fetch!("session_id")
-        {:undefined} -> sender_id
-      end
-
     state = %State{
       last_recieved_at: Timex.now(),
       messages: [],
       pid: pid(sender_id),
       sender_id: sender_id,
-      session_id: session_id
+      session_id: set_session_id(sender_id)
     }
+    Logger.info("Starting conversation with state #{state}")
 
     {:ok, state}
   end
@@ -127,5 +118,20 @@ defmodule Olivia.Chat.Conversation do
   defp schedule_timeout(pid) do
     Logger.debug(fn -> "Scheduling timeout for #{inspect(pid)}" end)
     :erlang.send_after(@timeout, pid, :timeout)
+  end
+
+  defp set_session_id(sender_id) do
+    case @default_nlp do
+      :none -> String.to_integer(sender_id)
+      _ ->  with thinking_api <- Olivia.Chat.Thinker.module_api() do
+              case thinking_api.create_session do
+                {:ok, %{body: body} = response} ->
+                  body
+                  |> Jason.decode!
+                  |> Map.fetch!("session_id")
+                {:undefined} -> sender_id
+              end
+            end
+    end
   end
 end

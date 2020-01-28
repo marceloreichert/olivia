@@ -12,14 +12,14 @@ defmodule Olivia.Chat.Interface.FbMessenger.Translation do
           "attachments" => [
             %{
               "payload" => %{
-                "sticker_id" => _sticker_id,
+                "sticker_id" => _payload_sticker_id,
                 "url" => url
               },
               "type" => "image"
             }
           ],
           "mid" => _fb_message_id,
-          "sticker_id" => _sticker_id
+          "sticker_id" => _message_sticker_id
         },
         "recipient" => %{"id" => recipient_id},
         "sender" => %{"id" => sender_id},
@@ -36,19 +36,18 @@ defmodule Olivia.Chat.Interface.FbMessenger.Translation do
   end
 
   def process_messages(%{
-        "message" => %{
-          "mid" => _fb_mid,
-          "seq" => _seq,
-          "text" => text
-        },
-        "recipient" => %{
-          "id" => recipient_id
-        },
-        "sender" => %{
-          "id" => sender_id
-        },
-        "timestamp" => timestamp
-      }) do
+    "message" => %{
+      "mid" => _fb_mid,
+      "text" => text
+    },
+    "recipient" => %{
+      "id" => recipient_id
+    },
+    "sender" => %{
+      "id" => sender_id
+    },
+    "timestamp" => timestamp
+  }) do
     %Impression{
       message: text,
       sender_id: sender_id,
