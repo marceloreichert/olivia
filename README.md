@@ -88,6 +88,7 @@ config :olivia,
   watson_assistant_id: "",
   watson_assistant_token: "",
   watson_assistant_version: "",
+  watson_assistant_url: "",
   default_nlp: :watson_assistant or :wit or :none,
   bot_name: <ProjectName>
 ```
