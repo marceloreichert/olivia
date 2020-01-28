@@ -7,7 +7,7 @@ defmodule Olivia.Chat.Thinker.WatsonAssistant.Api do
   @api_version Application.get_env(:olivia, :watson_assistant_version)
   @assistance_id Application.get_env(:olivia, :watson_assistant_id)
   @token Application.get_env(:olivia, :watson_assistant_token)
-  @endpoint_url "https://gateway.watsonplatform.net/assistant/api/v2/assistants/#{@assistance_id}"
+  @endpoint_url "https://api.us-south.assistant.watson.cloud.ibm.com/v2/assistants/#{@assistance_id}"
 
   @options [
     params: %{
