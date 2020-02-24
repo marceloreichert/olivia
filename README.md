@@ -57,7 +57,7 @@ Olivia is a bot orchestration framework built on Elixir/Phoenix.
     longpoll: false
 ```
 
-Send message with new_msg event:
+Send message with <new_msg> event:
 ```
     channel.push('new_msg', {
       name: "some_name",
