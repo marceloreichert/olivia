@@ -29,25 +29,25 @@ defmodule Olivia.Chat.Conversation do
 
   # API
   def start_link(sender_id) do
-    GenServer.start_link(__MODULE__, sender_id, name: via_tuple(sender_id))
+    GenServer.start_link(__MODULE__, sender_id, name: get_pid(sender_id))
   end
 
   def received_message(%{sender_id: sender_id} = impression) do
     Supervisor.start_child(sender_id)
-    GenServer.cast(via_tuple(sender_id), {:received, impression})
+    GenServer.cast(get_pid(sender_id), {:received, impression})
     impression
   end
 
   def sent_message(sender_id, response) do
-    GenServer.cast(via_tuple(sender_id), {:sent, response})
+    GenServer.cast(get_pid(sender_id), {:sent, response})
   end
 
   def get_session(sender_id) do
-    GenServer.call(via_tuple(sender_id), :get_session)
+    GenServer.call(get_pid(sender_id), :get_session)
   end
 
   def terminate(sender_id) do
-    GenServer.call(via_tuple(sender_id), :terminate)
+    GenServer.call(get_pid(sender_id), :terminate)
   end
 
 
@@ -61,7 +61,7 @@ defmodule Olivia.Chat.Conversation do
     state = %State{
       last_recieved_at: Timex.now(),
       messages: [],
-      pid: via_tuple(sender_id),
+      pid: get_pid(sender_id),
       sender_id: sender_id,
       session_id: set_session_id(sender_id)
     }
@@ -100,7 +100,7 @@ defmodule Olivia.Chat.Conversation do
     {:reply, state, state}
   end
 
-  defp via_tuple(sender_id) do
+  defp get_pid(sender_id) do
     {:via, Registry, {@registry, sender_id}}
   end
 
