@@ -1,4 +1,4 @@
-defmodule OliviaWeb.Channel.OliviaSocket do
+defmodule OliviaWeb.RoomChannel do
   use OliviaWeb, :channel
 
   @bot_name Application.get_env(:olivia, :bot_name)
@@ -17,7 +17,8 @@ defmodule OliviaWeb.Channel.OliviaSocket do
       |> Olivia.handle_messages
       |> @bot_name.Orchestra.run()
 
-    broadcast!(socket, "new_msg", %{message: impression.responses})
+    # broadcast!(socket, "new_msg", %{message: impression.responses})
+    broadcast!(socket, "new_msg", %{message: "TESTE"})
 
     {:reply, :ok, socket}
   end

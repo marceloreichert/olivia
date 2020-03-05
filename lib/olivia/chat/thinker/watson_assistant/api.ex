@@ -4,19 +4,21 @@ defmodule Olivia.Chat.Thinker.WatsonAssistant.Api do
   """
   alias Olivia.Chat.Conversation
 
-  @api_version Application.get_env(:olivia, :watson_assistant_version)
-  @assistance_id Application.get_env(:olivia, :watson_assistant_id)
-  @token Application.get_env(:olivia, :watson_assistant_token)
-  @endpoint_url "https://api.us-south.assistant.watson.cloud.ibm.com/v2/assistants/#{@assistance_id}"
+  @assistant_endpoint Application.get_env(:olivia, :watson_assistant_endpoint)
+  @assistance_api_version Application.get_env(:olivia, :watson_assistant_api_version)
+  @assistance_params_version Application.get_env(:olivia, :watson_assistant_params_version)
+  @assistant_apikey Application.get_env(:olivia, :watson_assistant_apikey)
+  @assistant_id Application.get_env(:olivia, :watson_assistant_id)
 
   @options [
     params: %{
-      "version" => @api_version
+      "version" => @assistance_params_version
     }
   ]
 
   @headers [
-    "Authorization": "Basic #{@token}",
+    "Authorization": "Basic " <> Base.encode64("apikey:" <> @assistant_apikey),
+    "Accept": "Application/json; Charset=utf-8",
     "Content-Type": "application/json"
   ]
 
@@ -25,7 +27,10 @@ defmodule Olivia.Chat.Thinker.WatsonAssistant.Api do
   """
   def create_session do
     url =
-      @endpoint_url
+      @assistant_endpoint
+      |> _append_to_url(@assistance_api_version)
+      |> _append_to_url("assistants")
+      |> _append_to_url(@assistant_id)
       |> _append_to_url("sessions")
       |> create_url(@options |> hd |> elem(1))
 
@@ -37,8 +42,12 @@ defmodule Olivia.Chat.Thinker.WatsonAssistant.Api do
   """
   def delete_session(session_id) do
     url =
-      @endpoint_url
-      |> _append_to_url("sessions/#{session_id}")
+      @assistant_endpoint
+      |> _append_to_url(@assistance_api_version)
+      |> _append_to_url("assistants")
+      |> _append_to_url(@assistant_id)
+      |> _append_to_url("sessions")
+      |> _append_to_url("#{session_id}")
       |> create_url(@options |> hd |> elem(1))
 
     {:ok, response} = HTTPoison.delete(url, [], @headers)
@@ -49,8 +58,13 @@ defmodule Olivia.Chat.Thinker.WatsonAssistant.Api do
   """
   def think_and_answer(session_id, text) do
     url =
-      @endpoint_url
-      |> _append_to_url("sessions/#{session_id}/message")
+      @assistant_endpoint
+      |> _append_to_url(@assistance_api_version)
+      |> _append_to_url("assistants")
+      |> _append_to_url(@assistant_id)
+      |> _append_to_url("sessions")
+      |> _append_to_url("#{session_id}")
+      |> _append_to_url("message")
       |> create_url(@options |> hd |> elem(1))
 
     options = %{

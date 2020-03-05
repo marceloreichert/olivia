@@ -2,40 +2,22 @@ defmodule Olivia.Chat.Conversation.Supervisor do
   @moduledoc """
   Supervisor for conversation processes
   """
-
-  use Supervisor
+  use DynamicSupervisor
 
   alias Olivia.Chat.Conversation
-  alias Olivia.Chat.Conversation.Watcher
 
-  @doc false
-  def start_link do
-    Supervisor.start_link(__MODULE__, nil, name: __MODULE__)
+  def start_link(_arg) do
+    DynamicSupervisor.start_link(__MODULE__, [], name: __MODULE__)
   end
 
-  @doc """
-  Start a new conversation
-  """
-  @spec start_child(Conversation.sender_id()) :: {:ok, pid}
-  def start_child(sender_id) do
-    child_spec = worker(Conversation, [sender_id], id: sender_id, restart: :transient)
-    Supervisor.start_child(__MODULE__, child_spec)
+  @impl true
+  def init(_init_arg) do
+    DynamicSupervisor.init(strategy: :one_for_one)
   end
 
-  @doc """
-  Stop a conversation
-  """
-  @spec delete_child(Conversation.sender_id()) :: {:ok, pid}
-  def delete_child(sender_id) do
-    Supervisor.delete_child(__MODULE__, sender_id)
-  end
-
-  @doc false
-  def init(_) do
-    children = [
-      worker(Watcher, [])
-    ]
-
-    supervise(children, strategy: :one_for_one)
+  def start_child(child_name) do
+    DynamicSupervisor.start_child(
+      __MODULE__,
+      %{id: Conversation, start: { Conversation, :start_link,  [child_name]}, restart: :transient})
   end
 end

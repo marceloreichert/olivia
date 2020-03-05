@@ -2,6 +2,7 @@ defmodule Olivia.Chat.Thinker.WatsonAssistant.Thinking do
   @moduledoc """
   Thinking may use a Olivia NLP API to determine which routine the bot should execute.
   """
+  require Logger
 
   alias Olivia.Chat.Thinker.WatsonAssistant.Api
   alias Olivia.Chat.Conversation
@@ -24,6 +25,7 @@ defmodule Olivia.Chat.Thinker.WatsonAssistant.Thinking do
   defp think_and_answer(%{message: message, session_id: session_id} = impression) do
     with {:ok, response} <- Api.think_and_answer(session_id, message) do
       response
+      |> IO.inspect
       |> get_output(impression)
       |> get_context(response)
     end

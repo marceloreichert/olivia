@@ -52,17 +52,9 @@ Olivia is a bot orchestration framework built on Elixir/Phoenix.
 8. If you decide to use your own WebApp with channels, add socket config to endpoint:
 
 ```
-  socket "/socket", OliviaWeb.Channel.UserSocket,
+  socket "/socket", OliviaWeb.UserSocket,
     websocket: true,
     longpoll: false
-```
-
-Send message with <new_msg> event:
-```
-    channel.push('new_msg', {
-      name: "some_name",
-      message: "some_message"
-    });
 ```
 
 9. Add new file `/lib/<project_name>/orchestra.ex`

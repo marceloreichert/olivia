@@ -1,8 +1,8 @@
-defmodule OliviaWeb.Channel.UserSocket do
+defmodule OliviaWeb.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  channel "olivia:*", OliviaWeb.Channel.OliviaSocket
+  channel "olivia:*", OliviaWeb.RoomChannel
 
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.

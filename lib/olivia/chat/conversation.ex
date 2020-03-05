@@ -8,60 +8,46 @@ defmodule Olivia.Chat.Conversation do
 
   alias Olivia.Chat.Conversation.Supervisor
 
+  @registry :workers_registry
+
+  # alias Olivia.Chat.Conversation.Supervisor
+
   defmodule State do
     @moduledoc false
-    @environment Application.get_env(:olivia, :environment)
 
     defstruct [
       :sender_id,
       :last_recieved_at,
-      :messages,
       :pid,
       :session_id,
-      environment: @environment
+      :messages
     ]
   end
 
-  @type state :: %State{}
-  @type sender_id :: String.t()
-
   # five minutes timeout
   @timeout 5 * 60 * 1000
-  @default_nlp Application.get_env(:olivia, :default_nlp)
 
+  # API
   def start_link(sender_id) do
-    GenServer.start_link(__MODULE__, sender_id, name: pid(sender_id))
-  end
-
-  def pid(sender_id) do
-    {:via, Registry, {Olivia.Chat.Conversation.Registry, sender_id}}
+    GenServer.start_link(__MODULE__, sender_id, name: via_tuple(sender_id))
   end
 
   def received_message(%{sender_id: sender_id} = impression) do
-    ensure_process(sender_id)
-    GenServer.cast(pid(sender_id), {:received, impression})
+    Supervisor.start_child(sender_id)
+    GenServer.cast(via_tuple(sender_id), {:received, impression})
     impression
   end
 
   def sent_message(sender_id, response) do
-    ensure_process(sender_id)
-    GenServer.cast(pid(sender_id), {:sent, response})
+    GenServer.cast(via_tuple(sender_id), {:sent, response})
   end
 
   def get_session(sender_id) do
-    ensure_process(sender_id)
-    GenServer.call(pid(sender_id), :get_session)
-  end
-
-  def ensure_process(sender_id) do
-    case Registry.whereis_name({Olivia.Chat.Conversation.Registry, sender_id}) do
-      :undefined -> Supervisor.start_child(sender_id)
-      _ -> :ok
-    end
+    GenServer.call(via_tuple(sender_id), :get_session)
   end
 
   def terminate(sender_id) do
-    GenServer.call(pid(sender_id), :terminate)
+    GenServer.call(via_tuple(sender_id), :terminate)
   end
 
 
@@ -75,11 +61,10 @@ defmodule Olivia.Chat.Conversation do
     state = %State{
       last_recieved_at: Timex.now(),
       messages: [],
-      pid: pid(sender_id),
+      pid: via_tuple(sender_id),
       sender_id: sender_id,
       session_id: set_session_id(sender_id)
     }
-    Logger.info("Starting conversation with state #{state}")
 
     {:ok, state}
   end
@@ -115,20 +100,25 @@ defmodule Olivia.Chat.Conversation do
     {:reply, state, state}
   end
 
+  defp via_tuple(sender_id) do
+    {:via, Registry, {@registry, sender_id}}
+  end
+
   defp schedule_timeout(pid) do
     Logger.debug(fn -> "Scheduling timeout for #{inspect(pid)}" end)
     :erlang.send_after(@timeout, pid, :timeout)
   end
 
   defp set_session_id(sender_id) do
-    case @default_nlp do
+    case Application.get_env(:olivia, :default_nlp) do
       :none -> String.to_integer(sender_id)
       _ ->  with thinking_api <- Olivia.Chat.Thinker.module_api() do
               case thinking_api.create_session do
                 {:ok, %{body: body} = response} ->
-                  body
-                  |> Jason.decode!
-                  |> Map.fetch!("session_id")
+                  session_id =
+                    body
+                    |> Jason.decode!
+                    |> Map.fetch!("session_id")
                 {:undefined} -> sender_id
               end
             end
