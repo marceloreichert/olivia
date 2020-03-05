@@ -3,7 +3,7 @@ defmodule Olivia.Application do
 
   use Application
 
-  @registry :workers_registry
+  @registry :conversations_registry
 
   def start(_type, _args) do
     children = [

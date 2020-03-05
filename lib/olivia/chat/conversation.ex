@@ -8,7 +8,7 @@ defmodule Olivia.Chat.Conversation do
 
   alias Olivia.Chat.Conversation.Supervisor
 
-  @registry :workers_registry
+  @registry :conversations_registry
 
   # alias Olivia.Chat.Conversation.Supervisor
 
