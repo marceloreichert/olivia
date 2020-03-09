@@ -30,11 +30,13 @@ defmodule Olivia.Chat.Thinker.WatsonAssistant.Thinking do
     end
   end
 
-  defp get_output(%{output: %{generic: responses, entities: entities, intents: intents}} = response, impression) do
-    impression
-    |> add_responses(responses)
-    |> add_intents(intents)
-    |> add_entities(entities)
+  defp get_output(%{output: output} = response, impression) do
+    with %{entities: entities, intents: intents} <- output do
+      impression
+      |> add_responses(%{output: output})
+      |> add_intents(intents)
+      |> add_entities(entities)
+    end
   end
 
   defp get_context(impression, %{context: %{skills: %{"main skill": %{user_defined: context}}}} = response) do
