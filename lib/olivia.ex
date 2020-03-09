@@ -7,8 +7,8 @@ defmodule Olivia do
     payload
     |> Olivia.Chat.Interface.FbMessenger.Entry.entry_messages
   end
-  def handle_messages(%{"text" => text, "user" => %{"uid" => uid}} = payload) do
-    payload
+  def handle_messages(%{"input" => input} = payload) do
+    input
     |> Olivia.Chat.Interface.WebApp.Entry.entry_messages
   end
 end
