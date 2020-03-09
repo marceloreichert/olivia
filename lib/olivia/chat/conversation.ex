@@ -10,8 +10,6 @@ defmodule Olivia.Chat.Conversation do
 
   @registry :conversations_registry
 
-  # alias Olivia.Chat.Conversation.Supervisor
-
   defmodule State do
     @moduledoc false
 
@@ -23,9 +21,6 @@ defmodule Olivia.Chat.Conversation do
       :messages
     ]
   end
-
-  # five minutes timeout
-  @timeout 5 * 60 * 1000
 
   # API
   def start_link(sender_id) do
@@ -46,17 +41,9 @@ defmodule Olivia.Chat.Conversation do
     GenServer.call(get_pid(sender_id), :get_session)
   end
 
-  def terminate(sender_id) do
-    GenServer.call(get_pid(sender_id), :terminate)
-  end
-
-
   # GENSERVER
   def init(sender_id) do
     Logger.info("Starting conversation for #{sender_id}")
-
-    self()
-    |> schedule_timeout()
 
     state = %State{
       last_recieved_at: Timex.now(),
@@ -102,11 +89,6 @@ defmodule Olivia.Chat.Conversation do
 
   defp get_pid(sender_id) do
     {:via, Registry, {@registry, sender_id}}
-  end
-
-  defp schedule_timeout(pid) do
-    Logger.debug(fn -> "Scheduling timeout for #{inspect(pid)}" end)
-    :erlang.send_after(@timeout, pid, :timeout)
   end
 
   defp set_session_id(sender_id) do
