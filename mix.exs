@@ -64,6 +64,7 @@ defmodule Olivia.Mixfile do
       {:credo, "~> 1.1", only: [:dev, :test], runtime: false},
       {:excoveralls, "~> 0.8", only: :test},
       {:ex_doc, "~> 0.19", only: :dev},
+      {:accessible, "~> 0.2.1"}
     ]
   end
 
