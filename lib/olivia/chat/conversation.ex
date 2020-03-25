@@ -18,7 +18,13 @@ defmodule Olivia.Chat.Conversation do
       :last_recieved_at,
       :pid,
       :session_id,
-      :messages
+      :messages,
+      :intents,
+      :entities,
+      :context,
+      :responses,
+      :last_state
+
     ]
   end
 
