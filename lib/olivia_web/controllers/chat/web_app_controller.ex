@@ -6,13 +6,14 @@ defmodule OliviaWeb.Chat.WebAppController do
   def create(conn, params) do
     params
     |> Olivia.handle_messages
-    |> @bot_name.Orchestra.run
     |> send_response(conn)
   end
 
-  defp send_response(%{responses: responses} = impression, conn) do
-    response = Jason.encode!(%{responses: responses})
-    send_resp(conn, 200, response)
+  defp send_response(%{responses: responses, sender_id: sender_id} = impression, conn) do
+    send_resp(conn, 200, responses |> response_encode)
   end
 
+  defp response_encode(responses) do
+    response = Jason.encode!(%{responses: responses})
+  end
 end

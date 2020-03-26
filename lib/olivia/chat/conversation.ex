@@ -39,8 +39,13 @@ defmodule Olivia.Chat.Conversation do
     impression
   end
 
-  def sent_message(sender_id, response) do
-    GenServer.cast(get_pid(sender_id), {:sent, response})
+  def sent_message(%{sender_id: sender_id} = impression) do
+    GenServer.cast(get_pid(sender_id), {:sent, impression})
+    impression
+  end
+
+  def set_state(sender_id, impression) do
+    GenServer.cast(get_pid(sender_id), {:set_state, impression})
   end
 
   def get_session(sender_id) do
@@ -56,7 +61,8 @@ defmodule Olivia.Chat.Conversation do
       messages: [],
       pid: get_pid(sender_id),
       sender_id: sender_id,
-      session_id: set_session_id(sender_id)
+      session_id: set_session_id(sender_id),
+      last_state: nil
     }
 
     {:ok, state}
@@ -73,12 +79,20 @@ defmodule Olivia.Chat.Conversation do
     {:noreply, new_state}
   end
 
-  def handle_cast({:sent, response}, state) do
+  def handle_cast({:sent, %{last_state: last_state} = impression}, state) do
     Logger.info("Sent a message to #{state.sender_id}")
 
     new_state =
       state
-      |> Map.put(:messages, [response | state.messages])
+      |> Map.put(:last_state, last_state)
+
+    {:noreply, new_state}
+  end
+
+  def handle_cast({:set_state, %{last_state: last_state} = impression}, state) do
+    new_state =
+      state
+      |> Map.put(:last_state, last_state)
 
     {:noreply, new_state}
   end

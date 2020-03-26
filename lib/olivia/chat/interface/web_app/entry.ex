@@ -7,6 +7,8 @@ defmodule Olivia.Chat.Interface.WebApp.Entry do
   alias Olivia.Chat.Thinker
   alias Olivia.Chat.Interface.WebApp.Translation
 
+  @bot_name Application.get_env(:olivia, :bot_name)
+
   @doc """
   Entry point for messages
   """
@@ -15,5 +17,7 @@ defmodule Olivia.Chat.Interface.WebApp.Entry do
     |> Translation.translate_entry
     |> Conversation.received_message
     |> Thinker.run
+    |> @bot_name.Orchestra.run
+    |> Conversation.sent_message
   end
 end

@@ -5,14 +5,9 @@ defmodule Olivia.Chat.Interface.WebApp.Dispatcher do
 
   alias Olivia.Chat.Conversation
 
-  def send_response([]), do: []
-
-  def send_response([h | t]) do
-    [send_response(h) | send_response(t)]
-  end
-
-  def send_response(response) do
-    Conversation.sent_message(response["recipient"]["id"], response)
+  def send_response(%{responses: responses, sender_id: sender_id} = impression, conn) do
+    response = Jason.encode!(%{responses: responses})
+    Conversation.sent_message(sender_id, response)
     response
   end
 end
