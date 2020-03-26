@@ -35,8 +35,12 @@ defmodule Olivia.Chat.Conversation do
 
   def received_message(%{sender_id: sender_id} = impression) do
     Supervisor.start_child(sender_id)
-    GenServer.cast(get_pid(sender_id), {:received, impression})
-    impression
+
+    %{last_state: last_state} = GenServer.call(get_pid(sender_id), {:received, impression})
+
+    impression =
+      impression
+      |> Map.put(:last_state, last_state)
   end
 
   def sent_message(%{sender_id: sender_id} = impression) do
@@ -68,15 +72,15 @@ defmodule Olivia.Chat.Conversation do
     {:ok, state}
   end
 
-  def handle_cast({:received, payload}, state) do
+  def handle_call({:received, impression}, _from, state) do
     Logger.info("Received a message for #{state.sender_id}")
 
     new_state =
       state
       |> Map.put(:last_recieved_at, Timex.now())
-      |> Map.put(:messages, [payload | state.messages])
+      |> Map.put(:messages, [impression | state.messages])
 
-    {:noreply, new_state}
+    {:reply, new_state, state}
   end
 
   def handle_cast({:sent, %{last_state: last_state} = impression}, state) do
