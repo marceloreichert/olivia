@@ -24,7 +24,6 @@ defmodule Olivia.Chat.Conversation do
       :context,
       :responses,
       :last_state
-
     ]
   end
 
@@ -35,6 +34,8 @@ defmodule Olivia.Chat.Conversation do
 
   def received_message(%{sender_id: sender_id} = impression) do
     Supervisor.start_child(sender_id)
+
+    :timer.sleep(3_000)
 
     %{last_state: last_state} = GenServer.call(get_pid(sender_id), {:received, impression})
 
@@ -68,9 +69,17 @@ defmodule Olivia.Chat.Conversation do
       session_id: set_session_id(sender_id),
       last_state: nil
     }
+    Logger.info("Conversation start for #{sender_id}")
 
     {:ok, state}
   end
+
+  def handle_info(:long_init, state) do
+    :timer.sleep(3_000)
+
+    {:no_reply, state}
+  end
+
 
   def handle_call({:received, impression}, _from, state) do
     Logger.info("Received a message for #{state.sender_id}")
