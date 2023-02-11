@@ -39,9 +39,8 @@ defmodule Olivia.Chat.Conversation do
 
     %{last_state: last_state} = GenServer.call(get_pid(sender_id), {:received, impression})
 
-    impression =
-      impression
-      |> Map.put(:last_state, last_state)
+    impression
+    |> Map.put(:last_state, last_state)
   end
 
   def sent_message(%{sender_id: sender_id} = impression) do
@@ -69,7 +68,6 @@ defmodule Olivia.Chat.Conversation do
       session_id: set_session_id(sender_id),
       last_state: nil
     }
-    Logger.info("Conversation start for #{sender_id}")
 
     {:ok, state}
   end
@@ -92,7 +90,17 @@ defmodule Olivia.Chat.Conversation do
     {:reply, new_state, state}
   end
 
-  def handle_cast({:sent, %{last_state: last_state} = impression}, state) do
+  def handle_call(:terminate, _from, state) do
+    Logger.info("Terminating process: #{inspect(state)}")
+
+    {:stop, :normal, :ok, state}
+  end
+
+  def handle_call(:get_session, _from, %{session_id: _session_id} = state) do
+    {:reply, state, state}
+  end
+
+  def handle_cast({:sent, %{last_state: last_state} = _impression}, state) do
     Logger.info("Sent a message to #{state.sender_id}")
 
     new_state =
@@ -102,22 +110,12 @@ defmodule Olivia.Chat.Conversation do
     {:noreply, new_state}
   end
 
-  def handle_cast({:set_state, %{last_state: last_state} = impression}, state) do
+  def handle_cast({:set_state, %{last_state: last_state} = _impression}, state) do
     new_state =
       state
       |> Map.put(:last_state, last_state)
 
     {:noreply, new_state}
-  end
-
-  def handle_call(:terminate, _from, state) do
-    Logger.info("Terminating process: #{inspect(state)}")
-
-    {:stop, :normal, :ok, state}
-  end
-
-  def handle_call(:get_session, from, %{session_id: session_id} = state) do
-    {:reply, state, state}
   end
 
   defp get_pid(sender_id) do
@@ -129,12 +127,13 @@ defmodule Olivia.Chat.Conversation do
       :none -> String.to_integer(sender_id)
       _ ->  with thinking_api <- Olivia.Chat.Thinker.module_api() do
               case thinking_api.create_session do
-                {:ok, %{body: body} = response} ->
-                  session_id =
-                    body
-                    |> Jason.decode!
-                    |> Map.fetch!("session_id")
-                {:undefined} -> sender_id
+                {:ok, %{body: body} = _response} ->
+                  body
+                  |> Jason.decode!
+                  |> Map.fetch!("session_id")
+
+                {:undefined} ->
+                  sender_id
               end
             end
     end

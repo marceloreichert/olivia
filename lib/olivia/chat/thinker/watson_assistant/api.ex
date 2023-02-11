@@ -4,11 +4,11 @@ defmodule Olivia.Chat.Thinker.WatsonAssistant.Api do
   """
   alias Olivia.Chat.Conversation
 
-  @assistant_endpoint Application.get_env(:olivia, :watson_assistant_endpoint)
-  @assistance_api_version Application.get_env(:olivia, :watson_assistant_api_version)
-  @assistance_params_version Application.get_env(:olivia, :watson_assistant_params_version)
-  @assistant_apikey Application.get_env(:olivia, :watson_assistant_apikey)
-  @assistant_id Application.get_env(:olivia, :watson_assistant_id)
+  @assistant_endpoint Application.compile_env(:olivia, :watson_assistant_endpoint)
+  @assistance_api_version Application.compile_env(:olivia, :watson_assistant_api_version)
+  @assistance_params_version Application.compile_env(:olivia, :watson_assistant_params_version)
+  @assistant_apikey Application.compile_env(:olivia, :watson_assistant_apikey)
+  @assistant_id Application.compile_env(:olivia, :watson_assistant_id)
 
   @options [
     params: %{
