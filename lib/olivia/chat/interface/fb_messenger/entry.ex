@@ -8,56 +8,51 @@ defmodule Olivia.Chat.Interface.FbMessenger.Entry do
   alias Olivia.Chat.Interface.FbMessenger.Translation
   alias Olivia.Chat.Interface.FbMessenger.Dispatcher
 
+  @bot_name Application.compile_env(:olivia, :bot_name)
+
   @doc """
   Entry messages
   """
-  def entry_messages([%{"messaging" => messaging} | _] = payload) do
-    sender_id = hd(messaging)["sender"]["id"]
-    token = Application.get_env(:olivia, :fb_page_access_token)
-
-    start_typing_indicator(sender_id, token)
-
-    payload
-    |> Enum.each(&process_messages/1)
-
-    stop_typing_indicator(sender_id, token)
+  def entry_messages([%{"messaging" => messaging}] = _payload) do
+    messaging
+    |> Enum.map(&filter_message/1)
   end
 
-  def process_messages(%{"messaging" => [payload | _]}) do
-    sender_id = payload["sender"]["id"]
-    recipient_id = payload["recipient"]["id"]
-    token = Application.get_env(:olivia, :fb_page_access_token)
+  defp filter_message(%{"message" => _} = message), do: process_message(message)
 
-    payload
-    |> Translation.process_messages
-    |> Conversation.received_message
-    |> Thinker.run
-    |> Dispatcher.build_response(sender_id, token)
+  defp filter_message(%{"postback" => _} = message), do: process_message(message)
+
+  defp filter_message(_), do: nil
+
+  def process_message(message) do
+    message
+    |> start_typing_indicator()
+    |> Translation.process_messages()
+    |> Conversation.received_message()
+    |> Thinker.call()
+    |> @bot_name.Orchestra.call()
+    |> IO.inspect(label: "Return Message --> ")
+    |> Dispatcher.build_response()
+    |> stop_typing_indicator()
   end
 
-  @doc """
-  Sends a message to Facebook to signal typing.
-  """
-  defp start_typing_indicator(sender_id, token) do
+  defp start_typing_indicator(%{"sender" => %{"id" => sender_id}} = message) do
     %{
       "messaging_type" => "RESPONSE",
       "recipient" => %{"id" => sender_id},
       "sender_action" => "typing_on"
     }
-    |> Dispatcher.send_response(token)
+    |> Dispatcher.send_response()
 
-    sender_id
+    message
   end
 
-  @doc """
-  Sends a message to Facebook to end typing signal.
-  """
-  defp stop_typing_indicator(sender_id, token) do
+  defp stop_typing_indicator(%{sender_id: sender_id} = _message) do
     %{
       "messaging_type" => "RESPONSE",
       "recipient" => %{"id" => sender_id},
       "sender_action" => "typing_off"
     }
-    |> Dispatcher.send_response(token)
+    |> Dispatcher.send_response()
   end
 end

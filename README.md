@@ -31,8 +31,8 @@ Olivia is a bot orchestration framework built on Elixir/Phoenix.
 
   scope "/chat/messenger", OliviaWeb.Chat do
     pipe_through :webhook_fb_messenger
-    get "/", MessengerController, :verify
-    post "/", MessengerController, :create
+    get "/", FbMessengerController, :verify
+    post "/", FbMessengerController, :create
   end
 ```
 
@@ -86,9 +86,10 @@ config :olivia,
   fb_page_access_token: "",
   wit_server_access_token: "",
   watson_assistant_id: "",
-  watson_assistant_token: "",
-  watson_assistant_version: "",
-  watson_assistant_url: "",
+  watson_assistant_apikey: "",
+  watson_assistant_api_version: "v2",
+  watson_assistant_endpoint: "https://api.us-south.assistant.watson.cloud.ibm.com",
+  watson_assistant_params_version: "2021-11-27",
   default_nlp: :watson_assistant or :wit or :none,
   bot_name: <ProjectName>
 ```

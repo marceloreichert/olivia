@@ -7,64 +7,78 @@ defmodule Olivia.Chat.Thinker.WatsonAssistant.Thinking do
   alias Olivia.Chat.Thinker.WatsonAssistant.Api
   alias Olivia.Chat.Conversation
 
-  def run(impression) do
-    impression
+  def call(message) do
+    message
     |> get_conversation_session
     |> think_and_answer
   end
 
-  defp get_conversation_session(%{sender_id: sender_id} = impression) do
-    with state = Conversation.get_session(sender_id) do
-      with %{session_id: session_id} = state do
+  defp get_conversation_session(%{sender_id: sender_id} = message) do
+    with state <- Conversation.get_session(sender_id) do
+      with %{session_id: session_id} <- state do
         session_id
-        |> (&Map.merge(impression, %{session_id: &1})).()
+        |> (&Map.merge(message, %{session_id: &1})).()
       end
     end
   end
 
-  defp think_and_answer(%{message: message, session_id: session_id} = impression) do
-    with {:ok, response} <- Api.think_and_answer(session_id, message) do
-      response
-      |> get_output(impression)
-      |> get_context(response)
+  defp think_and_answer(%{text: text, session_id: session_id} = message) do
+    with {:ok, response} <- Api.think_and_answer(session_id, text) do
+      case response do
+        %{code: 404, error: error} ->
+          Map.merge(message, %{responses: [
+            %{
+              options: [
+                %{label: "start", value: %{input: %{text: "Recomeçar"}}}
+              ],
+              response_type: "option",
+              title: "Sessão inválida"
+            }
+          ]})
+
+        _ ->
+          response
+          |> get_output(message)
+          |> get_context(response)
+      end
     end
   end
 
-  defp get_output(%{output: output} = response, impression) do
-    with %{entities: entities, intents: intents} <- output do
-      impression
-      |> add_responses(%{output: output})
+  defp get_output(%{output: output} = response, message) do
+    with %{entities: entities, intents: intents, generic: responses} <- output do
+      message
+      |> add_responses(responses)
       |> add_intents(intents)
       |> add_entities(entities)
     end
   end
 
-  defp get_context(impression, %{context: %{skills: %{"main skill": %{user_defined: context}}}} = response) do
-    impression
+  defp get_context(message, %{context: %{skills: %{"main skill": %{user_defined: context}}}} = response) do
+    message
     |> add_context(context)
   end
-  defp get_context(impression, _) do
-    impression
+  defp get_context(message, _) do
+    message
   end
 
-  defp add_context(impression, user_defined) do
+  defp add_context(message, user_defined) do
     user_defined
-    |> (&Map.merge(impression, %{context: &1})).()
+    |> (&Map.merge(message, %{context: &1})).()
   end
 
-  defp add_responses(impression, responses) do
+  defp add_responses(message, responses) do
     responses
-    |> (&Map.merge(impression, %{responses: &1})).()
+    |> (&Map.merge(message, %{responses: &1})).()
   end
 
-  defp add_intents(impression, intents) do
+  defp add_intents(message, intents) do
     intents
-    |> (&Map.merge(impression, %{intents: &1})).()
+    |> (&Map.merge(message, %{intents: &1})).()
   end
 
-  defp add_entities(impression, entities) do
+  defp add_entities(message, entities) do
     entities
-    |> (&Map.merge(impression, %{entities: &1})).()
+    |> (&Map.merge(message, %{entities: &1})).()
   end
 
   defp get_session(%{body: watson_response}) do

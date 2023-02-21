@@ -15,15 +15,15 @@ defmodule Olivia.Chat.Conversation do
 
     defstruct [
       :sender_id,
-      :last_recieved_at,
+      :last_received_at,
       :pid,
       :session_id,
       :messages,
-      :intents,
-      :entities,
+      :intent,
+      :entity,
       :context,
       :responses,
-      :last_state
+      :metadata
     ]
   end
 
@@ -32,24 +32,37 @@ defmodule Olivia.Chat.Conversation do
     GenServer.start_link(__MODULE__, sender_id, name: get_pid(sender_id))
   end
 
-  def received_message(%{sender_id: sender_id} = impression) do
+  def received_message(nil), do: nil
+
+  def received_message(%{sender_id: sender_id} = message) do
     Supervisor.start_child(sender_id)
 
     :timer.sleep(3_000)
 
-    %{last_state: last_state} = GenServer.call(get_pid(sender_id), {:received, impression})
+    GenServer.call(get_pid(sender_id), {:received, message})
 
-    impression
-    |> Map.put(:last_state, last_state)
+    message
   end
 
-  def sent_message(%{sender_id: sender_id} = impression) do
-    GenServer.cast(get_pid(sender_id), {:sent, impression})
-    impression
+  def sent_message(%{"recipient" => %{"id" => sender_id}} = message) do
+    GenServer.cast(get_pid(sender_id), {:sent, message})
+    message
   end
 
-  def set_state(sender_id, impression) do
-    GenServer.cast(get_pid(sender_id), {:set_state, impression})
+  def set_state(sender_id, message) do
+    GenServer.cast(get_pid(sender_id), {:set_state, message})
+  end
+
+  def set_intent(sender_id, value) do
+    GenServer.cast(get_pid(sender_id), {:set_intent, value})
+  end
+
+  def set_entity(sender_id, value) do
+    GenServer.cast(get_pid(sender_id), {:set_entity, value})
+  end
+
+  def set_metadata(sender_id, value) do
+    GenServer.cast(get_pid(sender_id), {:set_metadata, value})
   end
 
   def get_session(sender_id) do
@@ -61,12 +74,12 @@ defmodule Olivia.Chat.Conversation do
     Logger.info("Starting conversation for #{sender_id}")
 
     state = %State{
-      last_recieved_at: Timex.now(),
+      last_received_at: Timex.now(),
       messages: [],
       pid: get_pid(sender_id),
       sender_id: sender_id,
       session_id: set_session_id(sender_id),
-      last_state: nil
+      metadata: %{}
     }
 
     {:ok, state}
@@ -79,13 +92,13 @@ defmodule Olivia.Chat.Conversation do
   end
 
 
-  def handle_call({:received, impression}, _from, state) do
+  def handle_call({:received, message}, _from, state) do
     Logger.info("Received a message for #{state.sender_id}")
 
     new_state =
       state
       |> Map.put(:last_recieved_at, Timex.now())
-      |> Map.put(:messages, [impression | state.messages])
+      |> Map.put(:messages, [message | state.messages])
 
     {:reply, new_state, state}
   end
@@ -100,20 +113,40 @@ defmodule Olivia.Chat.Conversation do
     {:reply, state, state}
   end
 
-  def handle_cast({:sent, %{last_state: last_state} = _impression}, state) do
+  def handle_cast({:sent, _message}, state) do
     Logger.info("Sent a message to #{state.sender_id}")
 
+    {:noreply, state}
+  end
+
+  def handle_cast({:set_state, value}, state) do
     new_state =
       state
-      |> Map.put(:last_state, last_state)
+      |> Map.put(:metadata, value)
 
     {:noreply, new_state}
   end
 
-  def handle_cast({:set_state, %{last_state: last_state} = _impression}, state) do
+  def handle_cast({:set_intent, value}, state) do
     new_state =
       state
-      |> Map.put(:last_state, last_state)
+      |> Map.put(:intent, value)
+
+    {:noreply, new_state}
+  end
+
+  def handle_cast({:set_entity, value}, state) do
+    new_state =
+      state
+      |> Map.put(:entity, value)
+
+    {:noreply, new_state}
+  end
+
+  def handle_cast({:set_metadata, value}, state) do
+    new_state =
+      state
+      |> Map.put(:metadata, value)
 
     {:noreply, new_state}
   end

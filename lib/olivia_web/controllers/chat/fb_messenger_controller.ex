@@ -3,6 +3,7 @@ defmodule OliviaWeb.Chat.FbMessengerController do
 
   def create(conn, params) do
     params
+    |> IO.inspect()
     |> Olivia.handle_messages()
 
     send_resp(conn, 200, "EVENT_RECEIVED")

@@ -3,10 +3,9 @@ defmodule Olivia.Chat.Interface.FbMessenger.Dispatcher do
   Dispatcher messages
   """
 
-  alias Olivia.Chat.Conversation
-
-  @page_access_token Application.get_env(:olivia, :fb_page_access_token)
+  @page_access_token Application.compile_env(:olivia, :fb_page_access_token)
   @headers [{"Content-Type", "application/json"}]
+  @token Application.compile_env(:olivia, :fb_page_access_token)
 
   def send_response([]), do: []
 
@@ -15,36 +14,31 @@ defmodule Olivia.Chat.Interface.FbMessenger.Dispatcher do
   end
 
   def send_response(response) do
-    url = "https://graph.facebook.com/v2.11/me/messages?access_token=#{@page_access_token}"
+    url = "https://graph.facebook.com/v16.0/me/messages?access_token=#{@token}"
 
     case HTTPoison.post(url, Jason.encode!(response), @headers) do
       {:ok, %HTTPoison.Response{status_code: 200}} ->
-        Conversation.sent_message(response["recipient"]["id"], response)
+        # Conversation.sent_message(response)
         :ok
 
       error ->
+        IO.inspect(error)
         error
     end
   end
 
-  def send_response(response, token) do
-    url = "https://graph.facebook.com/v2.6/me/messages?access_token=#{token}"
+  def build_response(nil), do: nil
 
-    case HTTPoison.post(url, Jason.encode!(response), @headers) do
-      {:ok, %HTTPoison.Response{status_code: 200}} ->
-        Conversation.sent_message(response["recipient"]["id"], response)
-        :ok
-
-      error ->
-        error
-    end
-  end
-
-  def build_response(%{responses: responses} = impression, sender_id, token) do
+  def build_response(%{responses: responses, sender_id: sender_id} = message) do
     responses
-    |> build(sender_id, token)
+    |> Enum.map(fn response ->
+      prepare_response(response, sender_id)
+    end)
+
+    message
   end
-  def build_response(text, sender_id, token) do
+
+  def prepare_response(%{response_type: "text", text: text} = _response, sender_id) do
     %{
       "messaging_type" => "RESPONSE",
       "recipient" => %{"id" => sender_id},
@@ -52,13 +46,70 @@ defmodule Olivia.Chat.Interface.FbMessenger.Dispatcher do
         "text" => text
       }
     }
-    |> send_response(token)
+    |> send_response()
   end
 
-  def build([], sender_id, token) do
-     build_response("", sender_id, token)
-   end
-  def build([h | t], sender_id, token) do
-    [build_response(h[:text], sender_id, token) | build(t, sender_id, token)]
+  def prepare_response(%{response_type: "list", options: options} = _response, sender_id) do
+    elements =
+      options
+      |> Enum.map(fn %{title: title, subtitle: subtitle, image_url: image_url, url: url} ->
+        %{
+          "title" => title,
+          "image_url" => image_url,
+          "subtitle" => subtitle,
+          "default_action" => %{
+            "type" => "web_url",
+            "url" => url,
+            "messenger_extensions" => false,
+            "webview_height_ratio" => "tall"
+          }
+        }
+      end)
+
+    %{
+      "recipient" => %{"id" => sender_id},
+      "message" => %{
+        "attachment" => %{
+          "type" => "template",
+          "payload" => %{
+            "template_type" => "generic",
+            "elements" => elements
+          }
+        }
+      }
+    }
+    |> send_response()
+  end
+
+  def prepare_response(%{response_type: "option", title: title, options: options} = _response, sender_id) do
+    buttons =
+      options
+      |> Enum.map(fn %{label: label, value: %{input: %{text: text}}} = _option ->
+        %{
+          "type" => "postback",
+          "title" => text,
+          "payload" => label
+        }
+      end)
+
+    elements =
+      %{
+        "title" => title,
+        "buttons" => buttons
+      }
+
+    %{
+      "recipient" => %{"id" => sender_id},
+      "message" => %{
+        "attachment" => %{
+          "type" => "template",
+          "payload" => %{
+            "template_type" => "generic",
+            "elements" => [elements]
+          }
+        }
+      }
+    }
+    |> send_response()
   end
 end

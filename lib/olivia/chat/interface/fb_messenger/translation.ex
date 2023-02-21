@@ -2,7 +2,7 @@ defmodule Olivia.Chat.Interface.FbMessenger.Translation do
   @moduledoc """
   Handles translating payloads received from FB
   """
-  alias Olivia.Chat.Impression
+  alias Olivia.Message
 
   @doc """
   Translates standard text entry
@@ -25,14 +25,14 @@ defmodule Olivia.Chat.Interface.FbMessenger.Translation do
         "sender" => %{"id" => sender_id},
         "timestamp" => timestamp
       }) do
-    %Impression{
+    struct(Message, %{
       url: url,
       sender_id: sender_id,
       recipient_id: recipient_id,
       timestamp: timestamp,
-      origin: :messenger,
+      origin: :fb_messenger,
       session_id: nil
-    }
+    })
   end
 
   def process_messages(%{
@@ -48,13 +48,38 @@ defmodule Olivia.Chat.Interface.FbMessenger.Translation do
     },
     "timestamp" => timestamp
   }) do
-    %Impression{
-      message: text,
+    struct(Message, %{
+      text: text,
       sender_id: sender_id,
       recipient_id: recipient_id,
       timestamp: timestamp,
-      origin: :messenger,
+      origin: :fb_messenger,
       session_id: nil
-    }
+    })
   end
+
+  def process_messages(%{
+    "postback" => %{
+      "payload" => payload
+    },
+    "recipient" => %{
+      "id" => recipient_id
+    },
+    "sender" => %{
+      "id" => sender_id
+    },
+    "timestamp" => timestamp
+  }) do
+    struct(Message, %{
+      text: payload,
+      payload: payload,
+      sender_id: sender_id,
+      recipient_id: recipient_id,
+      timestamp: timestamp,
+      origin: :fb_messenger,
+      session_id: nil
+    })
+  end
+
+  def process_messages(_), do: nil
 end

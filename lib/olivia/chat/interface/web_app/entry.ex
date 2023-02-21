@@ -15,12 +15,8 @@ defmodule Olivia.Chat.Interface.WebApp.Entry do
   def entry_messages(payload) do
     payload
     |> Translation.translate_entry
-    |> IO.inspect()
     |> Conversation.received_message
-    |> IO.inspect()
     |> Thinker.run
-    |> IO.inspect()
-    |> @bot_name.Orchestra.run
-    |> Conversation.sent_message
+    |> @bot_name.Orchestra.call()
   end
 end

@@ -1,8 +1,11 @@
-defmodule Olivia.Chat.Impression do
-  @moduledoc false
-  @behaviour Access
+defmodule Olivia.Message do
+  @moduledoc """
+  This struct holds all information about a message.
+  """
 
-  defstruct message: nil,
+  alias __MODULE__, as: Message
+
+  defstruct text: nil,
             url: nil,
             sender_id: :init,
             recipient_id: :init,
@@ -14,7 +17,5 @@ defmodule Olivia.Chat.Impression do
             entities: nil,
             context: nil,
             responses: nil,
-            last_state: nil
-  use Accessible
-
+            metadata: nil
 end

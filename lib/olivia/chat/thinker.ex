@@ -3,19 +3,21 @@ defmodule Olivia.Chat.Thinker do
   Use a Olivia NLP API to determine which THINKER should be executed.
   """
 
-  @default_nlp Application.get_env(:olivia, :default_nlp)
+  @default_nlp Application.compile_env(:olivia, :default_nlp)
 
-  def run(impression) do
-    impression
-    |> module_nlp_thinking().run
+  def call(nil), do: nil
+
+  def call(message) do
+    message
+    |> module_nlp_thinking().call()
   end
 
-  def module_nlp_thinking do
-    Module.concat(["Olivia", "Chat", "Thinker", nlp, "Thinking"])
+  def module_api() do
+    Module.concat(["Olivia", "Chat", "Thinker", nlp(), "Api"])
   end
 
-  def module_api do
-    Module.concat(["Olivia", "Chat", "Thinker", nlp, "Api"])
+  defp module_nlp_thinking do
+    Module.concat(["Olivia", "Chat", "Thinker", nlp(), "Thinking"])
   end
 
   defp nlp do
