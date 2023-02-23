@@ -25,7 +25,7 @@ defmodule Olivia.Chat.Thinker.WatsonAssistant.Thinking do
   defp think_and_answer(%{text: text, session_id: session_id} = message) do
     with {:ok, response} <- Api.think_and_answer(session_id, text) do
       case response do
-        %{code: 404, error: error} ->
+        %{code: 404, error: _error} ->
           Map.merge(message, %{responses: [
             %{
               options: [
@@ -44,7 +44,7 @@ defmodule Olivia.Chat.Thinker.WatsonAssistant.Thinking do
     end
   end
 
-  defp get_output(%{output: output} = response, message) do
+  defp get_output(%{output: output} = _response, message) do
     with %{entities: entities, intents: intents, generic: responses} <- output do
       message
       |> add_responses(responses)
@@ -53,7 +53,7 @@ defmodule Olivia.Chat.Thinker.WatsonAssistant.Thinking do
     end
   end
 
-  defp get_context(message, %{context: %{skills: %{"main skill": %{user_defined: context}}}} = response) do
+  defp get_context(message, %{context: %{skills: %{"main skill": %{user_defined: context}}}} = _response) do
     message
     |> add_context(context)
   end

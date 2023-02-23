@@ -3,7 +3,6 @@ defmodule Olivia.Chat.Thinker.Wit.Api do
     WIT AI integration for intent handling and NLP
   """
 
-  @token Application.get_env(:olivia, :wit_server_access_token)
   @message_url "https://api.wit.ai/message?"
   @api_version "20171201"
 
@@ -18,7 +17,8 @@ defmodule Olivia.Chat.Thinker.Wit.Api do
       }
     ]
 
-    headers = [Authorization: "Bearer #{@token}", Accept: "Application/json; Charset=utf-8"]
+    token = Application.get_env(:olivia, :wit_server_access_token)
+    headers = [Authorization: "Bearer #{token}", Accept: "Application/json; Charset=utf-8"]
 
     url =
       @message_url

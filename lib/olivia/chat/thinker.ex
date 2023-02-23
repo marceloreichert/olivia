@@ -20,9 +20,8 @@ defmodule Olivia.Chat.Thinker do
     Module.concat(["Olivia", "Chat", "Thinker", nlp(), "Thinking"])
   end
 
-  defp nlp do
-    @default_nlp
-    |> Atom.to_string
+  defp nlp() do
+    Application.get_env(:olivia, :default_nlp)
     |> Macro.camelize
   end
 end
