@@ -16,3 +16,5 @@ npm-debug.log
 /config/*.secret.exs
 
 cover/
+
+/.env
