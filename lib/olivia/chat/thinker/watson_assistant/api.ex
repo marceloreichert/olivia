@@ -112,7 +112,7 @@ defmodule Olivia.Chat.Thinker.WatsonAssistant.Api do
         }
       ],
       headers: [
-        "Authorization": "Basic " <> Base.encode64("apikey:" <> Application.get_env(:olivia, :watson_assistant_apikey)),
+        "Authorization": "Basic " <> Base.encode64("apikey:" <> Application.get_env(:olivia, :watson_assistant_apikey, "")),
         "Accept": "Application/json; Charset=utf-8",
         "Content-Type": "application/json"
       ]
