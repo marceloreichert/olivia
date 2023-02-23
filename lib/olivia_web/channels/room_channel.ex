@@ -1,7 +1,7 @@
 defmodule OliviaWeb.RoomChannel do
   use OliviaWeb, :channel
 
-  @bot_name Application.get_env(:olivia, :bot_name)
+  @bot_name Application.compile_env(:olivia, :bot_name, "")
 
   def join("olivia:" <> uid, payload, socket) do
     if authorized?(payload) do

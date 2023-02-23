@@ -12,7 +12,7 @@ defmodule Olivia.Chat.Interface.FbMessenger.Dispatcher do
   end
 
   def send_response(response) do
-    token = Application.get_env(:olivia, :fb_page_access_token)
+    token = Application.get_env(:olivia, :fb_page_access_token, "")
     url = "https://graph.facebook.com/v16.0/me/messages?access_token=#{token}"
 
     case HTTPoison.post(url, Jason.encode!(response), @headers) do

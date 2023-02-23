@@ -21,7 +21,7 @@ defmodule Olivia.Chat.Thinker do
   end
 
   defp nlp() do
-    Application.get_env(:olivia, :default_nlp)
+    Application.get_env(:olivia, :default_nlp, "")
     |> Macro.camelize
   end
 end

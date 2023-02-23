@@ -156,8 +156,8 @@ defmodule Olivia.Chat.Conversation do
   end
 
   defp set_session_id(sender_id) do
-    case Application.get_env(:olivia, :default_nlp) do
-      :none -> String.to_integer(sender_id)
+    case Application.get_env(:olivia, :default_nlp, "") do
+      "" -> String.to_integer(sender_id)
       _ ->  with thinking_api <- Olivia.Chat.Thinker.module_api() do
               case thinking_api.create_session do
                 {:ok, %{body: body} = _response} ->

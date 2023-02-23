@@ -17,7 +17,7 @@ defmodule Olivia.Chat.Thinker.Wit.Api do
       }
     ]
 
-    token = Application.get_env(:olivia, :wit_server_access_token)
+    token = Application.get_env(:olivia, :wit_server_access_token, "")
     headers = [Authorization: "Bearer #{token}", Accept: "Application/json; Charset=utf-8"]
 
     url =
